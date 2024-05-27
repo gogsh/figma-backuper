@@ -11,8 +11,10 @@ const api = require('./apiHelper');
 const config = require('../config.json');
 
 // Указываем путь до chromedriver'а внутри node_modules
-const service = new chrome.ServiceBuilder(path).build();
-chrome.setDefaultService(service);
+// const service = new chrome.ServiceBuilder(path).build();
+// chrome.setDefaultService(service);
+
+const service = new chrome.ServiceBuilder(path);
 
 /**
  *
@@ -432,16 +434,7 @@ class Backuper {
             if (title === 'Untitled') this.webdriver.sleep(this.period * 2);
 
             if (this.options.debug && !success) {
-                const element = await this.webdriver.wait(
-                    WebDriver.until.elementLocated(WebDriver.By.css('html')),
-                    500
-                );
-                try {
-                    const html = await element.getAttribute('innerHTML');
-                    console.log(html);
-                } catch (e) {
-                    console.log('CANT GET HTML');
-                }
+                console.log('error with file download');
             }
 
             return success;
@@ -492,6 +485,28 @@ class Backuper {
             }
             await this.webdriver.sleep(this.period);
         } while (count > 0);
+
+
+        // частичное сохранение
+        const partialDownloadButton = await this.waitForElementAndGet(selector.savePartialButton)
+
+        if(partialDownloadButton) {
+            let timesToCheck = 1000;
+            await partialDownloadButton.click();
+
+            do {
+                timesToCheck--
+                console.log('partial download')
+                if(fsHelper.isFileInDirectory(tmpFolder, title)) {
+                    console.log('TRUE')
+                    fsHelper.moveFile(tmpFolder, folder, title, true);
+                    return true;
+                } 
+                await this.webdriver.sleep(this.period)
+   
+            } while(timesToCheck > 0)
+
+        }
 
         if (this.options.verbose) console.log(title + ' не скачался');
         return false;
