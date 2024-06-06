@@ -51,6 +51,8 @@ class Backuper {
 
     private webdriver: any;
 
+    private partialFiles: {name: string, link: string}[] = []
+
     constructor(options) {
         this.options = options;
         this.titles = new Set();
@@ -394,7 +396,7 @@ class Backuper {
             return false;
         }
 
-        return await this.saveToDisk(title, linkToFolder.folder);
+        return await this.saveToDisk(title, linkToFolder.folder, linkToFolder.link);
     }
 
     getTitle(linkToFolder: LinkToFolder) {
@@ -408,7 +410,7 @@ class Backuper {
     /**
      *
      */
-    async saveToDisk(title: string, folder: string): Promise<Boolean> {
+    async saveToDisk(title: string, folder: string, link: string): Promise<Boolean> {
         try {
             // сохранение файла
             const html = await this.webdriver.findElement(WebDriver.By.css("html"));
@@ -428,7 +430,7 @@ class Backuper {
 
             // чтобы файл успел скачаться
             let count = Math.round(this.delayFileDownload / this.period);
-            const success = await this.waitExistenceOfFile(count, title, folder);
+            const success = await this.waitExistenceOfFile(count, title, folder, link);
 
             // надеемся, что файл с дефолтным, вероятно, повторяющимся названием, тоже успеет скачаться
             if (title === 'Untitled') this.webdriver.sleep(this.period * 2);
@@ -457,7 +459,7 @@ class Backuper {
     /**
      * ожидание, пока файл с нужным именем появится в каталоге
      */
-    async waitExistenceOfFile(count: number, title: string, folder: string) {
+    async waitExistenceOfFile(count: number, title: string, folder: string, link: string) {
         let titleWithFolder = `${title} ${folder}`;
         const tmpFolder = fsHelper.prepareFolderName(this.baseFolder, 'temp');
 
@@ -494,11 +496,17 @@ class Backuper {
             let timesToCheck = 1000;
             await partialDownloadButton.click();
 
+            this.partialFiles.push({ name: title, link })
+
             do {
                 timesToCheck--
                 console.log('partial download')
                 if(fsHelper.isFileInDirectory(tmpFolder, title)) {
                     console.log('TRUE')
+
+                     /** Создание отчета частично скаченных файлов */
+                    fsHelper.saveBackupInfoAsFile('backupInfo.json', this.partialFiles, this.baseFolder);
+
                     fsHelper.moveFile(tmpFolder, folder, title, true);
                     return true;
                 } 

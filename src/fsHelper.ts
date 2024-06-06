@@ -36,7 +36,6 @@ const moveFile = (
   tmpFolderName: string,
   folderName: string,
   fileName: string,
-  isPartial: boolean
 ) => {
   const [oldPath] = glob.sync(path.join(tmpFolderName, `${fileName}*.fig`), {
     nodir: true,
@@ -50,9 +49,24 @@ const moveFile = (
   return newPath;
 };
 
+const saveBackupInfoAsFile = (fileName: string, backupInfo: any, baseFolder: string) => {
+  fs.writeFileSync(fileName, JSON.stringify(backupInfo, null, 2));
+
+  const destinationFilePath = `${baseFolder}/${fileName}`;
+
+  fs.rename(fileName, destinationFilePath, (err) => {
+    if (err) {
+      console.error('Error moving file:', err);
+    } else {
+      console.log('File moved successfully!');
+    }
+  });
+};
+
 module.exports = {
   createFolder,
   prepareFolderName,
   isFileInDirectory,
   moveFile,
+  saveBackupInfoAsFile
 };
