@@ -29,7 +29,7 @@ class Backuper {
     // максимальное время ожидания появления элемента, 1 минута
     private delayElement: number = 60 * 1000;
     // максимальное время ожидания скачивания файла, 5 минут
-    private delayFileDownload: number = 5 * 60 * 1000;
+    private delayFileDownload: number = 10 * 60 * 1000;
 
     // За какое время скачивать файлы при частичном бекапе и при использовании --auto-incremental в день частичного бекапа
     private hoursForPartialBackup: number = 48; // количество часов
@@ -493,7 +493,8 @@ class Backuper {
         const partialDownloadButton = await this.waitForElementAndGet(selector.savePartialButton)
 
         if(partialDownloadButton) {
-            let timesToCheck = 1000;
+            // домножается на this.period. Сейчас 500 * 2000 милисекунд (~16 минут)
+            let timesToCheck = 2000;
             await partialDownloadButton.click();
 
             this.partialFiles.push({ name: title, link })
