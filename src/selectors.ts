@@ -12,14 +12,14 @@ const recentFilesSelector = '[class^=tiles_view--tiles] a:not([draggable])'; // 
 const savePartialButton = '[class^="visual_bell--button"]'; // кнопка частичной загрузки
 
 module.exports = {
-    menuLinkDrafts,
-    menuLinkProjects,
-    authBlock,
-    authFieldLogin,
-    authFieldPassword,
-    loginLink,
-    folderNameInFile,
-    quickActionsInput,
-    recentFilesSelector,
-    savePartialButton,
+  menuLinkDrafts,
+  menuLinkProjects,
+  authBlock,
+  authFieldLogin,
+  authFieldPassword,
+  loginLink,
+  folderNameInFile,
+  quickActionsInput,
+  recentFilesSelector,
+  savePartialButton,
 };

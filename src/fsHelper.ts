@@ -1,6 +1,6 @@
-const fs = require("fs");
-const glob = require("glob");
-const path = require("path");
+const fs = require('fs');
+const glob = require('glob');
+const path = require('path');
 
 /**
  *
@@ -49,7 +49,11 @@ const moveFile = (
   return newPath;
 };
 
-const saveBackupInfoAsFile = (fileName: string, backupInfo: any, baseFolder: string) => {
+const saveBackupInfoAsFile = (
+  fileName: string,
+  backupInfo: any,
+  baseFolder: string,
+) => {
   fs.writeFileSync(fileName, JSON.stringify(backupInfo, null, 2));
 
   const destinationFilePath = `${baseFolder}/${fileName}`;
@@ -68,5 +72,5 @@ module.exports = {
   prepareFolderName,
   isFileInDirectory,
   moveFile,
-  saveBackupInfoAsFile
+  saveBackupInfoAsFile,
 };
