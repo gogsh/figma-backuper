@@ -18,7 +18,7 @@ class Backuper {
 
   // максимальное время ожидания появления элемента, 1 минута
   private delayElement: number = 60 * 1000;
-  // максимальное время ожидания скачивания файла, 15 минут
+  // максимальное время ожидания скачивания файла, 20 минут
   private delayFileDownload: number = 20 * 60 * 1000;
 
   // За какое время скачивать файлы при частичном бекапе и при использовании --auto-incremental в день частичного бекапа
@@ -410,7 +410,7 @@ class Backuper {
     const timeStart = Date.now();
     try {
       // ждем загрузки страницы проверкой наличия элемента
-      await driver.sleep(20000); // Ждём 10 секунды ибо фигма глючит часто
+      await driver.sleep(20000); // Ждём 20 секунды ибо фигма глючит часто
       await this.waitForElementAndGet(selector.folderNameInFile);
       const timeForOne = this.formatTime((Date.now() - timeStart) / 1000);
       if (this.options.debug)
