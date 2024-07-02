@@ -54,7 +54,7 @@ const saveBackupInfoAsFile = (
   backupInfo: any,
   baseFolder: string,
 ) => {
-  fs.writeFileSync(fileName, JSON.stringify(backupInfo, null, 2));
+  fs.writeFileSync(fileName, backupInfo);
 
   const destinationFilePath = `${baseFolder}/${fileName}`;
 

@@ -10,15 +10,6 @@ const mailer = require('./mailer');
 const api = require('./apiHelper');
 const config = require('../config.json');
 
-// Указываем путь до chromedriver'а внутри node_modules
-// const service = new chrome.ServiceBuilder(path).build();
-// chrome.setDefaultService(service);
-
-const service = new chrome.ServiceBuilder(path);
-
-/**
- *
- */
 class Backuper {
   private user: User[];
 
@@ -27,8 +18,8 @@ class Backuper {
 
   // максимальное время ожидания появления элемента, 1 минута
   private delayElement: number = 60 * 1000;
-  // максимальное время ожидания скачивания файла, 5 минут
-  private delayFileDownload: number = 10 * 60 * 1000;
+  // максимальное время ожидания скачивания файла, 15 минут
+  private delayFileDownload: number = 20 * 60 * 1000;
 
   // За какое время скачивать файлы при частичном бекапе и при использовании --auto-incremental в день частичного бекапа
   private hoursForPartialBackup: number = 48; // количество часов
@@ -376,8 +367,11 @@ class Backuper {
       }
     }
 
-    await mailer.sendEmail(
+    // сохранение отчета в html
+    fsHelper.saveBackupInfoAsFile(
+      'report.html',
       fullReport.join('<br><hr><hr>\n<br>\n') + '<br>\n<br>\n' + this.totalTime,
+      this.baseFolder,
     );
   }
 
@@ -416,7 +410,7 @@ class Backuper {
     const timeStart = Date.now();
     try {
       // ждем загрузки страницы проверкой наличия элемента
-      await driver.sleep(2000); // Ждём 2 секунды ибо фигма глючит часто
+      await driver.sleep(20000); // Ждём 10 секунды ибо фигма глючит часто
       await this.waitForElementAndGet(selector.folderNameInFile);
       const timeForOne = this.formatTime((Date.now() - timeStart) / 1000);
       if (this.options.debug)
@@ -561,44 +555,15 @@ class Backuper {
 
     do {
       count--;
+
       if (fsHelper.isFileInDirectory(tmpFolder, title)) {
+        await this.webdriver.sleep(100);
+
         fsHelper.moveFile(tmpFolder, folder, title);
         return true;
       }
       await this.webdriver.sleep(this.period);
     } while (count > 0);
-
-    // частичное сохранение
-    const partialDownloadButton = await this.waitForElementAndGet(
-      selector.savePartialButton,
-    );
-
-    if (partialDownloadButton) {
-      // домножается на this.period. Сейчас 500 * 2000 милисекунд (~16 минут)
-      let timesToCheck = 2000;
-      await partialDownloadButton.click();
-
-      this.partialFiles.push({ name: title, link });
-
-      do {
-        timesToCheck--;
-        console.log('partial download');
-        if (fsHelper.isFileInDirectory(tmpFolder, title)) {
-          console.log('TRUE');
-
-          /** Создание отчета частично скаченных файлов */
-          fsHelper.saveBackupInfoAsFile(
-            'backupInfo.json',
-            this.partialFiles,
-            this.baseFolder,
-          );
-
-          fsHelper.moveFile(tmpFolder, folder, title, true);
-          return true;
-        }
-        await this.webdriver.sleep(this.period);
-      } while (timesToCheck > 0);
-    }
 
     if (this.options.verbose) console.log(title + ' не скачался');
     return false;
@@ -712,7 +677,10 @@ class Backuper {
       },
     });
 
-    return new WebDriver.Builder().withCapabilities(chromeCapabilities).build();
+    return new WebDriver.Builder()
+      .forBrowser('chrome')
+      .withCapabilities(chromeCapabilities)
+      .build();
   }
 
   /**
