@@ -658,7 +658,7 @@ class Backuper {
       args: [
         '--test-type',
         '--start-maximized',
-        '--headless',
+        // '--headless',
         '--no-sandbox',
         '--log-level=' +
           (this.options.debug ? '1' : this.options.verbose ? '2' : '3'),

@@ -3,7 +3,7 @@ const authFieldLogin = 'input[type=email]'; // форма аутентифика
 const authFieldPassword = 'input[type=password]'; // форма аутентификации, поле пароля
 const loginLink = '#auth-view-page button[type=submit]'; // кнопка "Login"
 
-const menuLinkDrafts = '[class^="sidebar_row--sidebarRow--pxKum"]';
+const menuLinkDrafts = '[class^="sidebar--navContent"]';
 // const menuLinkDrafts = '[class^="folder_link--draftsName"]'; // пункт меню "Drafts"
 const menuLinkProjects = '[class^="folder_link--folderName"]'; // проект в левой колонке
 const folderNameInFile = '[class^="toolbar_view--buttonGroup"]'; // кнопки,

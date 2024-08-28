@@ -1,7 +1,7 @@
 {
     "dependencies": {
         "axios": "^0.19.2",
-        "chromedriver": "^125.0.0",
+        "chromedriver": "^128.0.0",
         "glob": "^7.1.6",
         "nodemailer": "^6.4.3",
         "selenium-webdriver": "^4.1.1",
