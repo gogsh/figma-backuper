@@ -22,7 +22,7 @@ const prepareFolderName = (...parts) => {
  * находится ли данный файл в данной директории
  */
 const isFileInDirectory = (folderName: string, fileName) => {
-  const files = glob.sync(path.join(folderName, `${fileName}*.fig`), {
+  const files = glob.sync(path.join(folderName, `${fileName}*.{fig,jam}`), {
     nodir: true,
   });
 
@@ -37,14 +37,15 @@ const moveFile = (
   folderName: string,
   fileName: string,
 ) => {
-  const [oldPath] = glob.sync(path.join(tmpFolderName, `${fileName}*.fig`), {
-    nodir: true,
-  });
-  //   const newPath = path.join(
-  //     folderName,
-  //     `${fileName}-${isPartial ? "partial" : ""}.fig`
-  //   );
-  const newPath = path.join(folderName, `${fileName}.fig`);
+  const [oldPath] = glob.sync(
+    path.join(tmpFolderName, `${fileName}*.{fig,jam}`),
+    {
+      nodir: true,
+    },
+  );
+
+  const extension = path.extname(oldPath);
+  const newPath = path.join(folderName, `${fileName}${extension}`);
   fs.renameSync(oldPath, newPath);
   return newPath;
 };

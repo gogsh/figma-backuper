@@ -89,8 +89,7 @@ const getProjectFiles = async (projectId: string, token: string) => {
       console.log(`!!! ${urlApi}projects/${projectId}/files axios error`);
 
       if (i >= MAX_TRIES - 1) {
-        // Если упало много раз - пробрасываем ошибку выше
-        throw e;
+        return [];
       }
     }
   }

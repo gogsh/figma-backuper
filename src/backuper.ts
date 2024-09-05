@@ -1,14 +1,13 @@
 import { LinksToProjectsAndTeams, LinkToFolder, Report, User } from './types';
 
 const WebDriver = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome');
-const path = require('chromedriver').path;
+const fs = require('fs');
 
 const selector = require('./selectors');
 const fsHelper = require('./fsHelper');
-const mailer = require('./mailer');
 const api = require('./apiHelper');
 const config = require('../config.json');
+const lastRunReport = require('../lastRunReport.json');
 
 class Backuper {
   private user: User[];
@@ -41,14 +40,15 @@ class Backuper {
 
   private webdriver: any;
 
-  private partialFiles: { name: string; link: string }[] = [];
-
   constructor(options) {
     this.options = options;
     this.titles = new Set();
     this.baseFolder = config.baseFolder;
     this.user = config.user;
-    this.hoursForPartialBackup = parseInt(config.hoursForPartialBackup, 10);
+    this.hoursForPartialBackup = parseInt(
+      lastRunReport?.hoursPassed || config.hoursForPartialBackup,
+      10,
+    );
     this.daysForAutoIncrementalBackup = parseInt(
       config.daysForAutoIncrementalBackup,
       10,
@@ -93,7 +93,14 @@ class Backuper {
     const timeForAll = this.formatTime((Date.now() - timeStart) / 1000);
     this.totalTime = 'Total time used: ' + timeForAll;
 
-    await this.sendReport(this.reportsData);
+    const hoursPassed = Math.ceil(Math.abs(Date.now() - timeStart) / 36e5);
+
+    fs.writeFileSync(
+      'lastRunReport.json',
+      JSON.stringify({ hoursPassed }, null, 2),
+    );
+    // Math.ceil(Math.abs(new Date() - a) / 36e5)
+    // await this.sendReport(this.reportsData);
   }
 
   async backupOneUser(user: User) {
