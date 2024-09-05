@@ -9,4 +9,10 @@ const backuper = new Backuper({
   autoIncremental: flags.indexOf('--auto-incremental') !== -1,
 });
 
-backuper.doBackup();
+async function main() {
+  while (true) {
+    await backuper.doBackup();
+  }
+}
+
+main();
