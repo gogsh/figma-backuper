@@ -11,7 +11,11 @@ const backuper = new Backuper({
 
 async function main() {
   while (true) {
-    await backuper.doBackup();
+    try {
+      await backuper.doBackup();
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
 

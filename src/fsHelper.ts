@@ -22,11 +22,12 @@ const prepareFolderName = (...parts) => {
  * находится ли данный файл в данной директории
  */
 const isFileInDirectory = (folderName: string, fileName) => {
-  const files = glob.sync(path.join(folderName, `${fileName}*.{fig,jam}`), {
-    nodir: true,
-  });
-
-  return files.length > 0;
+  const files = fs.readdirSync(folderName);
+  return files.some(
+    (file) =>
+      file.startsWith(fileName) &&
+      (file.endsWith('.fig') || file.endsWith('.jam')),
+  );
 };
 
 /**
@@ -37,17 +38,20 @@ const moveFile = (
   folderName: string,
   fileName: string,
 ) => {
-  const [oldPath] = glob.sync(
-    path.join(tmpFolderName, `${fileName}*.{fig,jam}`),
-    {
-      nodir: true,
-    },
+  const files = fs.readdirSync(tmpFolderName);
+  const oldPath = files.find(
+    (file) =>
+      file.startsWith(fileName) &&
+      (file.endsWith('.fig') || file.endsWith('.jam')),
   );
-
-  const extension = path.extname(oldPath);
-  const newPath = path.join(folderName, `${fileName}${extension}`);
-  fs.renameSync(oldPath, newPath);
-  return newPath;
+  if (oldPath) {
+    const extension = path.extname(oldPath);
+    const newPath = path.join(folderName, `${fileName}${extension}`);
+    fs.renameSync(path.join(tmpFolderName, oldPath), newPath);
+    return newPath;
+  } else {
+    throw new Error(`File not found: ${fileName}`);
+  }
 };
 
 const saveBackupInfoAsFile = (

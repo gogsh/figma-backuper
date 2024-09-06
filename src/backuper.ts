@@ -17,8 +17,8 @@ class Backuper {
 
   // максимальное время ожидания появления элемента, 1 минута
   private delayElement: number = 60 * 1000;
-  // максимальное время ожидания скачивания файла, 25 минут
-  private delayFileDownload: number = 25 * 60 * 1000;
+  // максимальное время ожидания скачивания файла, 120 минут
+  private delayFileDownload: number = 120 * 60 * 1000;
 
   // За какое время скачивать файлы при частичном бекапе и при использовании --auto-incremental в день частичного бекапа
   private hoursForPartialBackup: number = 48; // количество часов
@@ -467,7 +467,7 @@ class Backuper {
     const splitLinkThird =
       splitLinkSecond[splitLinkSecond.length - 1].split('%2F');
 
-    return splitLinkThird.join('_').replace('/|/g', '_');
+    return splitLinkThird.join('_').replace(/\|/g, '_');
   }
 
   /**
@@ -563,8 +563,15 @@ class Backuper {
     do {
       count--;
 
+      console.log(
+        'is file in directory',
+        fsHelper.isFileInDirectory(tmpFolder, title),
+        tmpFolder,
+        title,
+      );
+
       if (fsHelper.isFileInDirectory(tmpFolder, title)) {
-        await this.webdriver.sleep(100);
+        await this.webdriver.sleep(this.period);
 
         fsHelper.moveFile(tmpFolder, folder, title);
         return true;

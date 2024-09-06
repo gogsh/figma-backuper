@@ -6,3 +6,4 @@ config.json.*
 chromedriver*
 package-lock.json
 backup
+test.js
