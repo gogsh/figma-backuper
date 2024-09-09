@@ -563,13 +563,6 @@ class Backuper {
     do {
       count--;
 
-      console.log(
-        'is file in directory',
-        fsHelper.isFileInDirectory(tmpFolder, title),
-        tmpFolder,
-        title,
-      );
-
       if (fsHelper.isFileInDirectory(tmpFolder, title)) {
         await this.webdriver.sleep(this.period);
 

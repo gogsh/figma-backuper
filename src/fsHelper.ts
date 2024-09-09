@@ -20,14 +20,11 @@ const prepareFolderName = (...parts) => {
 
 /**
  * находится ли данный файл в данной директории
- */
+//  */
 const isFileInDirectory = (folderName: string, fileName) => {
   const files = fs.readdirSync(folderName);
-  return files.some(
-    (file) =>
-      file.startsWith(fileName) &&
-      (file.endsWith('.fig') || file.endsWith('.jam')),
-  );
+
+  return !!files.length;
 };
 
 /**
@@ -39,14 +36,11 @@ const moveFile = (
   fileName: string,
 ) => {
   const files = fs.readdirSync(tmpFolderName);
-  const oldPath = files.find(
-    (file) =>
-      file.startsWith(fileName) &&
-      (file.endsWith('.fig') || file.endsWith('.jam')),
-  );
+  const oldPath = files[0];
+
   if (oldPath) {
-    const extension = path.extname(oldPath);
-    const newPath = path.join(folderName, `${fileName}${extension}`);
+    const newPath = path.join(folderName, oldPath);
+
     fs.renameSync(path.join(tmpFolderName, oldPath), newPath);
     return newPath;
   } else {
