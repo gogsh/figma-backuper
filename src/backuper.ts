@@ -482,7 +482,7 @@ class Backuper {
       // сохранение файла
       const html = await this.webdriver.findElement(WebDriver.By.css('html'));
 
-      await html.sendKeys(WebDriver.Key.CONTROL + '/');
+      await html.sendKeys(WebDriver.Key.CONTROL + 'k');
       await this.webdriver.sleep(200);
 
       const input = await this.webdriver.findElement(
